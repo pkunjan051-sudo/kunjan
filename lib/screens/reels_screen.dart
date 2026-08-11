@@ -515,7 +515,7 @@ class _ReelsScreenState extends State<ReelsScreen> {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    color: Colors.white90,
+                    color: Colors.white70,
                     fontSize: 13,
                     height: 1.4,
                     shadows: [
