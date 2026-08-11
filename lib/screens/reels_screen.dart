@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 import '../models/movie.dart';
 import '../services/api_service.dart';
 import '../services/favorites_service.dart';
@@ -10,7 +11,7 @@ import '../widgets/safe_network_image.dart';
 import '../widgets/trailer_player_modal.dart';
 import 'movie_details_screen.dart';
 
-/// Full-screen Instagram Reels style vertical feed for movie trailers & clips.
+/// Full-screen Instagram Reels style vertical feed for movie trailers & video clips.
 class ReelsScreen extends StatefulWidget {
   const ReelsScreen({super.key});
 
@@ -288,33 +289,19 @@ class _ReelsScreenState extends State<ReelsScreen> {
   }
 
   Widget _buildReelPage(Movie movie, int index, bool isActive) {
-    final effectiveKey = movie.effectiveVideoKey;
-
     return GestureDetector(
       onTapDown: (details) => _handleDoubleTap(index, details),
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // Background Video / Media Preview
+          // Background Live Video / Media Component
           Positioned.fill(
-            child: isActive
-                ? InlineTrailerPreview(
-                    videoKey: effectiveKey,
-                    fallbackImageUrl: movie.fullBackdropUrl,
-                    title: movie.title,
-                    width: double.infinity,
-                    height: double.infinity,
-                    autoPlay: true,
-                    muted: _isMuted,
-                  )
-                : SafeNetworkImage(
-                    imageUrl: movie.fullBackdropUrl,
-                    fallbackUrl: movie.fullPosterUrl,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                    title: movie.title,
-                  ),
+            child: ReelMediaItem(
+              key: ValueKey('reel-${movie.id}'),
+              movie: movie,
+              isActive: isActive,
+              isMuted: _isMuted,
+            ),
           ),
 
           // Dark Gradient Overlays for readable text
@@ -599,6 +586,193 @@ class _ReelsScreenState extends State<ReelsScreen> {
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+/// Auto-playing Reel Media Player handling both YouTube trailer embeds & MP4 video streams.
+class ReelMediaItem extends StatefulWidget {
+  final Movie movie;
+  final bool isActive;
+  final bool isMuted;
+
+  const ReelMediaItem({
+    super.key,
+    required this.movie,
+    required this.isActive,
+    required this.isMuted,
+  });
+
+  @override
+  State<ReelMediaItem> createState() => _ReelMediaItemState();
+}
+
+class _ReelMediaItemState extends State<ReelMediaItem> {
+  VideoPlayerController? _videoController;
+  String? _fetchedVideoKey;
+  bool _isFetchingKey = false;
+  bool _isMp4Initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchedVideoKey = widget.movie.videoKey;
+    if (widget.isActive) {
+      _initializeReel();
+    }
+  }
+
+  @override
+  void didUpdateWidget(ReelMediaItem oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isActive != oldWidget.isActive) {
+      if (widget.isActive) {
+        _initializeReel();
+      } else {
+        _disposeMp4Player();
+      }
+    } else if (widget.isMuted != oldWidget.isMuted && _videoController != null) {
+      _videoController?.setVolume(widget.isMuted ? 0.0 : 1.0);
+    }
+  }
+
+  Future<void> _initializeReel() async {
+    // 1. Fetch YouTube Trailer key dynamically if not available
+    if ((_fetchedVideoKey == null || _fetchedVideoKey!.trim().isEmpty) && !_isFetchingKey) {
+      _isFetchingKey = true;
+      final key = await ApiService().getOrFetchTrailerKey(
+        widget.movie.id,
+        widget.movie.title,
+        initialKey: widget.movie.videoKey,
+      );
+      if (mounted) {
+        setState(() {
+          _fetchedVideoKey = key;
+          _isFetchingKey = false;
+        });
+      }
+    }
+
+    // 2. Initialize MP4 fallback player stream if needed
+    final effectiveKey = _fetchedVideoKey ?? widget.movie.effectiveVideoKey;
+    if (effectiveKey.trim().isEmpty && widget.isActive) {
+      _initMp4Player();
+    }
+  }
+
+  Future<void> _initMp4Player() async {
+    if (_videoController != null) return;
+    try {
+      final mp4Url = widget.movie.trailerMp4Url;
+      final controller = VideoPlayerController.networkUrl(Uri.parse(mp4Url));
+      _videoController = controller;
+      await controller.initialize();
+      if (!mounted || !widget.isActive) {
+        await controller.pause();
+        await controller.dispose();
+        _videoController = null;
+        return;
+      }
+      controller.setVolume(widget.isMuted ? 0.0 : 1.0);
+      controller.setLooping(true);
+      await controller.play();
+      if (mounted) {
+        setState(() {
+          _isMp4Initialized = true;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isMp4Initialized = false;
+        });
+      }
+    }
+  }
+
+  void _disposeMp4Player() {
+    final controller = _videoController;
+    _videoController = null;
+    if (mounted) {
+      setState(() {
+        _isMp4Initialized = false;
+      });
+    }
+    if (controller != null) {
+      controller.pause();
+      controller.dispose();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposeMp4Player();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveKey = _fetchedVideoKey ?? widget.movie.effectiveVideoKey;
+
+    // A) If YouTube trailer key is available and active, embed InlineTrailerPreview
+    if (effectiveKey.trim().isNotEmpty && widget.isActive) {
+      return InlineTrailerPreview(
+        videoKey: effectiveKey,
+        fallbackImageUrl: widget.movie.fullBackdropUrl,
+        title: widget.movie.title,
+        width: double.infinity,
+        height: double.infinity,
+        autoPlay: true,
+        muted: widget.isMuted,
+      );
+    }
+
+    // B) If MP4 video stream is initialized, play VideoPlayer
+    if (_videoController != null && _isMp4Initialized && widget.isActive) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          clipBehavior: Clip.hardEdge,
+          child: SizedBox(
+            width: _videoController!.value.size.width > 0 ? _videoController!.value.size.width : 1920,
+            height: _videoController!.value.size.height > 0 ? _videoController!.value.size.height : 1080,
+            child: VideoPlayer(_videoController!),
+          ),
+        ),
+      );
+    }
+
+    // C) Fallback backdrop image with loading indicator while fetching video
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        SafeNetworkImage(
+          imageUrl: widget.movie.fullBackdropUrl,
+          fallbackUrl: widget.movie.fullPosterUrl,
+          width: double.infinity,
+          height: double.infinity,
+          fit: BoxFit.cover,
+          title: widget.movie.title,
+        ),
+        if (widget.isActive && _isFetchingKey)
+          Center(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+              ),
+              child: const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                  strokeWidth: 2.5,
+                ),
+              ),
+            ),
+          ),
       ],
     );
   }
