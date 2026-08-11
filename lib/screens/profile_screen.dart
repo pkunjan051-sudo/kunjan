@@ -179,6 +179,62 @@ class ProfileScreen extends StatelessWidget {
             _buildSettingTile(Icons.download_rounded, 'Offline Downloads', 'High Quality (1080p)'),
             _buildSettingTile(Icons.security_rounded, 'Privacy & Security', 'Manage Account'),
 
+            const SizedBox(height: 24),
+
+            // CinemaCentral App Logo & Branding Banner
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceContainer,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.glassBorder),
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: 72,
+                    height: 72,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.5),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(18),
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    'CinemaCentral',
+                    style: TextStyle(
+                      fontFamily: 'Montserrat',
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Version 1.0.0 • Premium Entertainment Hub',
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 30),
           ],
         ),

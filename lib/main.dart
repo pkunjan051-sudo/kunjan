@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'services/favorites_service.dart';
 import 'theme/app_theme.dart';
-import 'screens/main_screen.dart';
+import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,7 @@ class CinemaCentralApp extends StatelessWidget {
       title: 'CinemaCentral',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
-      home: const MainScreen(),
+      home: const SplashScreen(),
     );
   }
 }

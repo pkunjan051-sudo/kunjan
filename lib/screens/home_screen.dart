@@ -159,9 +159,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(7),
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
@@ -171,7 +171,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: const Icon(Icons.movie_filter_rounded, color: Colors.white, size: 20),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  'assets/images/app_logo.png',
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             RichText(
