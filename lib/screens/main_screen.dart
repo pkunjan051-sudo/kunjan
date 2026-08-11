@@ -4,6 +4,7 @@ import '../services/favorites_service.dart';
 import '../theme/app_colors.dart';
 import 'home_screen.dart';
 import 'search_screen.dart';
+import 'reels_screen.dart';
 import 'favorites_screen.dart';
 import 'profile_screen.dart';
 
@@ -24,6 +25,7 @@ class _MainScreenState extends State<MainScreen> {
     _pages = [
       HomeScreen(onSearchTap: () => _onTabTapped(1)),
       const SearchScreen(),
+      const ReelsScreen(),
       FavoritesScreen(onExploreTap: () => _onTabTapped(0)),
       const ProfileScreen(),
     ];
@@ -61,6 +63,11 @@ class _MainScreenState extends State<MainScreen> {
                 icon: Icon(Icons.search_outlined),
                 selectedIcon: Icon(Icons.search_rounded),
                 label: 'Search',
+              ),
+              const NavigationDestination(
+                icon: Icon(Icons.movie_creation_outlined),
+                selectedIcon: Icon(Icons.movie_creation_rounded),
+                label: 'Reels',
               ),
               NavigationDestination(
                 icon: Badge(
