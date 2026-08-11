@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>CinemaCentral - Watchlist</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Montserrat:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#be0037",
+                        "on-secondary": "#472a00",
+                        "tertiary-fixed-dim": "#7bd0ff",
+                        "surface-container": "#171f33",
+                        "outline": "#ac8889",
+                        "secondary-fixed": "#ffddb8",
+                        "tertiary-container": "#007ca8",
+                        "surface-container-low": "#131b2e",
+                        "on-tertiary-container": "#f8fbff",
+                        "on-secondary-container": "#5b3800",
+                        "inverse-on-surface": "#283044",
+                        "primary-fixed": "#ffdada",
+                        "on-background": "#dae2fd",
+                        "on-surface": "#dae2fd",
+                        "on-primary-fixed": "#40000c",
+                        "on-primary": "#68001a",
+                        "on-primary-container": "#fffaf9",
+                        "surface-container-lowest": "#060e20",
+                        "on-error-container": "#ffdad6",
+                        "primary-fixed-dim": "#ffb3b6",
+                        "on-secondary-fixed": "#2a1700",
+                        "surface-container-highest": "#2d3449",
+                        "surface-container-high": "#222a3d",
+                        "surface-variant": "#2d3449",
+                        "surface-tint": "#ffb3b6",
+                        "tertiary": "#7bd0ff",
+                        "on-tertiary-fixed": "#001e2c",
+                        "primary-container": "#e11d48",
+                        "surface-dim": "#0b1326",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "on-tertiary": "#00354a",
+                        "secondary": "#ffb95f",
+                        "tertiary-fixed": "#c4e7ff",
+                        "surface-bright": "#31394d",
+                        "on-surface-variant": "#e5bdbe",
+                        "primary": "#ffb3b6",
+                        "on-primary-fixed-variant": "#920028",
+                        "inverse-surface": "#dae2fd",
+                        "outline-variant": "#5c3f40",
+                        "secondary-container": "#ee9800",
+                        "error": "#ffb4ab",
+                        "background": "#0b1326",
+                        "surface": "#0b1326",
+                        "error-container": "#93000a",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed-variant": "#004c69"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "margin-desktop": "64px",
+                        "gutter": "24px",
+                        "container-max": "1440px",
+                        "section-gap": "80px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "stack-lg": "32px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "display-sm": ["Montserrat"],
+                        "headline-lg-mobile": ["Montserrat"],
+                        "label-md": ["Inter"],
+                        "caption": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["64px", { "lineHeight": "72px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "display-sm": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #020617; /* Obsidian Base */
+            color: #dae2fd;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(2, 6, 23, 0.5);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(225, 29, 72, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(225, 29, 72, 0.6);
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col relative overflow-x-hidden selection:bg-primary-container selection:text-white">
+<!-- TopAppBar (Web) -->
+<header class="hidden md:flex fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_rgba(225,29,72,0.1)] items-center justify-between px-margin-desktop h-20 transition-all duration-300">
+<div class="flex items-center gap-gutter">
+<button class="p-2 text-primary hover:text-primary-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+<h1 class="font-display-sm text-display-sm tracking-tighter text-primary-container cursor-pointer hover:text-primary transition-colors">CinemaCentral</h1>
+<nav class="hidden lg:flex items-center gap-8 ml-8">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300 active:scale-95" href="#">Home</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-300 active:scale-95" href="#">Search</a>
+<a class="font-label-md text-label-md text-primary font-bold hover:text-primary transition-colors duration-300 active:scale-95 flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+                    Watchlist
+                </a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-2xl">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-surface-container-high border border-white/10 overflow-hidden cursor-pointer hover:border-primary transition-colors">
+<img class="w-full h-full object-cover" data-alt="A cinematic, high-contrast portrait of a stylish user in dark moody lighting with subtle red rim light, shot on 35mm film, exuding a premium, sophisticated vibe perfect for a high-end cinema app avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC65R3cXp2hvHArST5ZH4FvYMG7b0IX4Fp6wUrxGjhDch4UtcU-ScKlMcy_VGPjpOEyONJ77J0DXoQutiKfEwWt0RNn0MtrxJkLiT3q8-IJ4NUVsCnAuf_QKXee1E5fOPKuYM6WZIzf69CLyNuQ35tKmejkq6cUfiDZeiTbQ9N7-7cLR_5oZlsH4jgslQThhaEmJZQRFJoksMnDJQWoyZIQukt_oZ5XnTC7v8_m0qU74l_y-hek7ArLlA"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-8 md:pt-32 pb-32 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full flex flex-col gap-stack-lg">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md border-b border-white/5 pb-6">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg text-on-surface tracking-tight mb-2">My Watchlist</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">12 items saved for later</p>
+</div>
+<!-- Sorting Controls -->
+<div class="flex items-center gap-2 bg-surface-container-low p-1 rounded-lg border border-white/5">
+<button class="px-4 py-2 rounded-md font-label-md text-label-md bg-surface-variant text-on-surface shadow-sm transition-colors">Recently Added</button>
+<button class="px-4 py-2 rounded-md font-label-md text-label-md text-on-surface-variant hover:bg-white/5 transition-colors">Alphabetical</button>
+</div>
+</div>
+<!-- Watchlist Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-gutter">
+<!-- Item 1 -->
+<div class="group relative flex flex-col gap-3 rounded-xl overflow-hidden bg-[#0F172A] border border-white/10 hover:border-primary/50 transition-colors duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+<div class="relative aspect-[2/3] w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A moody, high-contrast cinematic movie poster featuring a silhouette of a lone figure standing against a glowing, neon-drenched dystopian cityscape. Deep obsidian shadows contrast with vibrant 'Action Gold' and 'Cinema Red' highlights, evoking a premium sci-fi thriller aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbg_RPyV6_8AaOjoZOtxHSogWirXullDqR1lnAX-V3lquXDme1nKEkX00V1ZNVUaVwZfhp6jwdxaXDwy2FfsF4qB5ikXSVDmIIaTPIvZxGTrJDtLnLDY_Xu8bm7c4jiZon5ftkWtI8pdX24zciIElI9oVduXUE83-IaI512zdmBVRj-ogSvj3O1IsKh2V6X-Adxh6bg73Tt4HGRlfQvIsUqMdFBd0_omQRUkpQMZYQAo0ll0kNF-XcwA"/>
+<!-- Overlay Gradient -->
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80"></div>
+<!-- Top Actions -->
+<div class="absolute top-3 right-3 z-10 flex gap-2">
+<button class="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-primary transition-colors border border-white/10" title="Remove from Watchlist">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Play Hover State -->
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/40 backdrop-blur-[2px]">
+<button class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.6)] transform scale-90 group-hover:scale-100 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<!-- Bottom Content (Inside Poster) -->
+<div class="absolute bottom-0 left-0 right-0 p-4 z-10 flex flex-col gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-[#1E293B] font-caption text-caption text-on-surface-variant border border-white/10">Sci-Fi</span>
+<span class="flex items-center gap-1 font-caption text-caption text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span> 8.7
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white line-clamp-1">Neon Resonance</h3>
+<p class="font-caption text-caption text-on-surface-variant line-clamp-1">Added 2 days ago</p>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group relative flex flex-col gap-3 rounded-xl overflow-hidden bg-[#0F172A] border border-white/10 hover:border-primary/50 transition-colors duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+<div class="relative aspect-[2/3] w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A sweeping, epic cinematic poster showing a dramatic mountainous landscape bathed in twilight. The color palette is rich in deep blues and striking crimson reds. The composition is minimal, focusing on the atmospheric depth and scale, reflecting a high-end fantasy epic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBW1tAm__iNg9OpL3F1keaApoPBgkevB1oosDDvQh19k0S7ohj8-jDHxKloi3zM6V4AZkdMOlwuBe4k4jC_7T8_QtZXRbURmKvYidSCRJFNrzHoJ0jh8v6MVaS2f6E0P5kDsj0z0RkrvSn5E3881489V-JcUW3NKj0mdwwKgtP8ngzY-PZgJoZ0vmDZ140MePhQmRrHzc2q4mz-NlWlik8d0vsrsfPdY_McwbHP4SHVCdUwK0u4kQf-PQ"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80"></div>
+<div class="absolute top-3 right-3 z-10 flex gap-2">
+<button class="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-primary transition-colors border border-white/10">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/40 backdrop-blur-[2px]">
+<button class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.6)] transform scale-90 group-hover:scale-100 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 p-4 z-10 flex flex-col gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-[#1E293B] font-caption text-caption text-on-surface-variant border border-white/10">Fantasy</span>
+<span class="flex items-center gap-1 font-caption text-caption text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span> 9.2
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white line-clamp-1">Echoes of Eternity</h3>
+<p class="font-caption text-caption text-on-surface-variant line-clamp-1">Added 1 week ago</p>
+</div>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group relative flex flex-col gap-3 rounded-xl overflow-hidden bg-[#0F172A] border border-white/10 hover:border-primary/50 transition-colors duration-300 shadow-[0_4px_24px_rgba(0,0,0,0.4)]">
+<div class="relative aspect-[2/3] w-full overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A tense, gritty cinematic movie poster featuring a close-up of a detective's eye reflected in a rain-slicked window. The aesthetic relies heavily on stark obsidian blacks and harsh, desaturated white rim lighting, creating a sophisticated, modern noir thriller mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8RpjFGm1MXgcx4dbj3CbEq-mYKp3veaJzX3persjsmHjoFtQS5h39CP14O8Mz-AFdKvNy_B2ckwxL4kru0HxQkkIU7dECrRxZqxvzA54pG9F7S-rxj_Z9E7DGe5gjm2js4aJl2qXgBLfUjLCy4gsouywaWBvFLW2Q01wGSzsozfz4uqBSzW_Nx2zERdnYELKxNqMC7WvsKzYVOfBPpwQsr9_WMz2ayjVyZHrv_UXTqFwkqtxyW9baOA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent opacity-80"></div>
+<div class="absolute top-3 right-3 z-10 flex gap-2">
+<button class="w-8 h-8 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center text-on-surface hover:text-primary transition-colors border border-white/10">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-black/40 backdrop-blur-[2px]">
+<button class="w-16 h-16 rounded-full bg-primary-container text-white flex items-center justify-center shadow-[0_0_30px_rgba(225,29,72,0.6)] transform scale-90 group-hover:scale-100 transition-transform duration-300">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</div>
+<div class="absolute bottom-0 left-0 right-0 p-4 z-10 flex flex-col gap-1 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+<div class="flex items-center gap-2 mb-1">
+<span class="px-2 py-0.5 rounded-full bg-[#1E293B] font-caption text-caption text-on-surface-variant border border-white/10">Thriller</span>
+<span class="flex items-center gap-1 font-caption text-caption text-secondary">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">star</span> 7.8
+                            </span>
+</div>
+<h3 class="font-headline-md text-headline-md text-white line-clamp-1">The Glass Whisper</h3>
+<p class="font-caption text-caption text-on-surface-variant line-clamp-1">Added 2 weeks ago</p>
+</div>
+</div>
+</div>
+<!-- Add More / Empty State Prompt -->
+<div class="group relative flex flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-white/10 bg-surface-container-low hover:bg-surface-container hover:border-primary/50 transition-all duration-300 cursor-pointer min-h-[300px]">
+<div class="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center group-hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-3xl text-on-surface-variant group-hover:text-primary transition-colors">add</span>
+</div>
+<div class="text-center px-4">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Discover More</h3>
+<p class="font-caption text-caption text-on-surface-variant">Find new films to add to your collection.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full rounded-t-xl z-50 bg-surface-container-lowest/90 backdrop-blur-2xl shadow-[0_-8px_40px_rgba(0,0,0,0.5)] flex justify-around items-center h-20 pb-safe px-4">
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity active:scale-90 duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-md text-[10px] leading-tight">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity active:scale-90 duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="font-label-md text-[10px] leading-tight">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary-container font-bold scale-110 active:scale-90 transition-all duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">bookmark</span>
+<span class="font-label-md text-[10px] leading-tight">Watchlist</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 transition-opacity active:scale-90 duration-200 gap-1 w-16" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="font-label-md text-[10px] leading-tight">Profile</span>
+</a>
+</nav>
+</body></html>
