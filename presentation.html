@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cinemacentral — Projector Optimized Flutter Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0D0E15;
+      --surface-dark: #171822;
+      --surface-card: #1E202E;
+      --border-color: #2A2C3D;
+      --primary-crimson: #E50914;
+      --accent-glow: #FF2E4C;
+      --gold-rating: #FFC107;
+      --tech-blue: #38BDF8;
+      --text-white: #FFFFFF;
+      --text-gray: #C4C7DA; /* Enhanced contrast for classroom projectors */
+      --text-muted: #8E92AC;
+      --font-heading: 'Montserrat', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-dark);
+      color: var(--text-white);
+      font-family: var(--font-body);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Deck Layout */
+    .deck-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide-viewport {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 65px);
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px 65px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transform: scale(0.98) translateY(10px);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: scale(1) translateY(0);
+    }
+
+    /* Header - Boosted for Projector Visibility */
+    .slide-header {
+      margin-bottom: 24px;
+    }
+
+    .category-badge {
+      display: inline-block;
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 1.8px;
+      color: var(--primary-crimson);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .slide-title {
+      font-family: var(--font-heading);
+      font-size: 2.5rem; /* Large 34pt equivalent */
+      font-weight: 900;
+      color: var(--text-white);
+      line-height: 1.2;
+    }
+
+    /* Grid & Cards */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      flex: 1;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      flex: 1;
+    }
+
+    .card {
+      background: var(--surface-dark);
+      border: 1.8px solid var(--border-color);
+      border-radius: 16px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: var(--primary-crimson);
+      transform: translateY(-2px);
+    }
+
+    .card-accent {
+      border-color: var(--primary-crimson);
+      background: linear-gradient(135deg, rgba(229, 9, 20, 0.1) 0%, var(--surface-dark) 100%);
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.45rem; /* Boosted to 20pt equivalent */
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .card-desc {
+      font-size: 1.1rem; /* Boosted to 15pt equivalent */
+      color: var(--text-gray);
+      line-height: 1.6;
+    }
+
+    .card-desc strong {
+      color: var(--text-white);
+    }
+
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .bullet-list li {
+      position: relative;
+      padding-left: 28px;
+      font-size: 1.1rem; /* Boosted for legibility */
+      color: var(--text-gray);
+      line-height: 1.55;
+    }
+
+    .bullet-list li::before {
+      content: "➔";
+      position: absolute;
+      left: 0;
+      top: 1px;
+      color: var(--primary-crimson);
+      font-weight: bold;
+    }
+
+    /* Flowchart / Diagram Styles - Enlarge Box & Text */
+    .flow-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 18px 0;
+    }
+
+    .flow-step {
+      flex: 1;
+      background: var(--surface-card);
+      border: 1.8px solid var(--border-color);
+      border-radius: 14px;
+      padding: 20px 14px;
+      text-align: center;
+      transition: all 0.3s ease;
+      min-height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .flow-step.highlight {
+      border-color: var(--primary-crimson);
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.3);
+    }
+
+    .flow-step-num {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--gold-rating);
+      margin-bottom: 6px;
+      letter-spacing: 1.2px;
+    }
+
+    .flow-step-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem; /* Boosted for projector readability */
+      font-weight: 800;
+      color: var(--text-white);
+      margin-bottom: 6px;
+    }
+
+    .flow-step-desc {
+      font-size: 0.95rem; /* Boosted */
+      color: var(--text-gray);
+      line-height: 1.35;
+    }
+
+    .flow-arrow {
+      color: var(--primary-crimson);
+      font-size: 1.6rem;
+      font-weight: bold;
+    }
+
+    /* Controls & Navigation Footer */
+    .deck-footer {
+      height: 65px;
+      background: var(--surface-dark);
+      border-top: 1.5px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 100;
+    }
+
+    .footer-left, .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-title {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-gray);
+    }
+
+    .nav-btn {
+      background: var(--surface-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-white);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: var(--primary-crimson);
+      border-color: var(--primary-crimson);
+    }
+
+    .slide-counter {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--gold-rating);
+      min-width: 65px;
+      text-align: center;
+    }
+
+    .progress-bar-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 8.33%;
+      background: var(--primary-crimson);
+      transition: width 0.3s ease;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Speaker Notes Modal */
+    .notes-panel {
+      position: fixed;
+      bottom: 75px;
+      right: 32px;
+      width: 420px;
+      max-height: 280px;
+      background: rgba(23, 24, 34, 0.96);
+      border: 1.5px solid var(--gold-rating);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 20px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 200;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+    }
+
+    .notes-panel.active {
+      display: flex;
+    }
+
+    .notes-header {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--gold-rating);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .notes-content {
+      font-size: 0.95rem;
+      color: var(--text-gray);
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+
+    /* Key Tag Pills */
+    .tag-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      background: rgba(229, 9, 20, 0.15);
+      border: 1px solid var(--primary-crimson);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--primary-crimson);
+      margin-right: 8px;
+    }
+
+    .tag-blue {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--tech-blue);
+      color: var(--tech-blue);
+    }
+
+    .tag-gold {
+      background: rgba(255, 193, 7, 0.15);
+      border-color: var(--gold-rating);
+      color: var(--gold-rating);
+    }
+  </style>
+</head>
+<body>
+
+<div class="deck-container">
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="slide-viewport">
+
+    <!-- SLIDE 1: Title Slide -->
+    <div class="slide active" data-notes="Welcome to the Cinemacentral project presentation. Today we are presenting a modern movie discovery and entertainment mobile application built using Flutter and Dart.">
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, rgba(229,9,20,0.15) 0%, transparent 70%);">
+        <span class="category-badge" style="font-size: 1.05rem; padding: 8px 20px; background: rgba(229,9,20,0.15); border-radius: 24px; border: 1.5px solid var(--primary-crimson);">
+          🎬 FLUTTER ENTERTAINMENT APP
+        </span>
+        <h1 class="slide-title" style="font-size: 4.5rem; margin: 18px 0 10px; text-shadow: 0 0 35px rgba(229,9,20,0.5);">
+          CINEMACENTRAL
+        </h1>
+        <p style="font-size: 1.7rem; color: var(--accent-glow); font-weight: 800; margin-bottom: 18px;">
+          Next-Generation Movie Discovery & Entertainment Platform
+        </p>
+        <p style="max-width: 800px; color: var(--text-gray); font-size: 1.25rem; line-height: 1.6; margin-bottom: 36px;">
+          A high-performance mobile application engineered with Flutter, Dart, REST APIs, and local persistence for a seamless movie browsing experience.
+        </p>
+
+        <div style="display: flex; gap: 20px; background: var(--surface-dark); border: 1.5px solid var(--border-color); padding: 18px 36px; border-radius: 14px;">
+          <div><span class="tag-pill tag-blue">Framework</span><strong style="font-size: 1.1rem;">Flutter 3.x</strong></div>
+          <div><span class="tag-pill">API</span><strong style="font-size: 1.1rem;">TMDB REST API v3</strong></div>
+          <div><span class="tag-pill tag-gold">Storage</span><strong style="font-size: 1.1rem;">SharedPreferences</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Introduction -->
+    <div class="slide" data-notes="Cinemacentral addresses the need for a unified movie discovery experience. It offers a poster-first design with instant API fetching and watchlist bookmarking.">
+      <div class="slide-header">
+        <span class="category-badge">OVERVIEW & PURPOSE</span>
+        <h2 class="slide-title">Introduction: What is Cinemacentral?</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-accent">
+          <div class="card-title" style="font-size: 1.6rem; color: var(--primary-crimson);">🎬 Application Vision</div>
+          <p class="card-desc" style="font-size: 1.15rem;">
+            <strong>Cinemacentral</strong> is a modern cross-platform mobile application built with Flutter and Dart to provide cinephiles with an engaging and intuitive space to explore cinema.
+          </p>
+          <br>
+          <p class="card-desc" style="font-size: 1.15rem;">
+            Acting as a centralized hub, it brings together real-time trending movies, top-rated films, genre filters, actor bios, trailer clips, and personalized watchlists into a single dark cinematic experience.
+          </p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="card">
+            <div class="card-title">🎯 Centralized Discovery</div>
+            <p class="card-desc">Consolidates global movie datasets, ratings, and video trailers into a unified interface without switching platforms.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">⚡ Immersive UX & Reels</div>
+            <p class="card-desc">Features vertical video trailer reels and poster carousels engineered specifically for fluid touch interaction.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">📌 Local Watchlist</div>
+            <p class="card-desc">Enables instant local persistence via SharedPreferences to save movies offline for later viewing.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Problem Statement -->
+    <div class="slide" data-notes="Highlighting the core pain points users face: scattered information, outdated web portals, and sluggish mobile performance.">
+      <div class="slide-header">
+        <span class="category-badge">USER PAIN POINTS</span>
+        <h2 class="slide-title">Problem Statement: Challenges in Existing Solutions</h2>
+      </div>
+
+      <div class="grid-3">
+        <div class="card card-accent">
+          <div class="flow-step-num" style="font-size: 0.9rem;">CHALLENGE 01</div>
+          <div class="card-title" style="font-size: 1.55rem;">Fragmented Data</div>
+          <p class="card-desc" style="font-size: 1.1rem; margin-top: 8px;">
+            Movie information is scattered across disparate platforms. Users must switch between browsers to check cast lists, ratings, storyline summaries, and video trailers.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="flow-step-num" style="font-size: 0.9rem;">CHALLENGE 02</div>
+          <div class="card-title" style="font-size: 1.55rem;">Outdated UI/UX</div>
+          <p class="card-desc" style="font-size: 1.1rem; margin-top: 8px;">
+            Many traditional movie discovery tools feature cluttered desktop layouts, uninspired typography, and poor mobile touch responsiveness.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="flow-step-num" style="font-size: 0.9rem;">CHALLENGE 03</div>
+          <div class="card-title" style="font-size: 1.55rem;">Sluggish Performance</div>
+          <p class="card-desc" style="font-size: 1.1rem; margin-top: 8px;">
+            Heavy web applications and unoptimized media delivery lead to slow image loading times, UI lag, and high battery consumption on mobile.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Project Objectives -->
+    <div class="slide" data-notes="Our core objectives focus on building a dark-mode, Netflix-inspired interface, implementing REST API data flows, and ensuring cross-platform performance.">
+      <div class="slide-header">
+        <span class="category-badge">GOALS & CORE CAPABILITIES</span>
+        <h2 class="slide-title">Project Objectives</h2>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating); font-size: 1.45rem;">🎨 Modern Dark-Themed UI</div>
+          <p class="card-desc" style="font-size: 1.15rem;">Create a sleek Netflix/IMDb-inspired aesthetic with glassmorphic elements and high-contrast typography.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating); font-size: 1.45rem;">🔌 Live REST API Integration</div>
+          <p class="card-desc" style="font-size: 1.15rem;">Fetch live global cinema dataset directly from TMDB REST API v3 using asynchronous HTTP request handling.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating); font-size: 1.45rem;">📲 Responsive Layout Engine</div>
+          <p class="card-desc" style="font-size: 1.15rem;">Ensure adaptive, pixel-perfect rendering across diverse mobile screen aspect ratios and resolutions.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating); font-size: 1.45rem;">🚀 Smooth Navigation & State</div>
+          <p class="card-desc" style="font-size: 1.15rem;">Implement Material 3 NavigationBar and reactive state management for instant watchlist updates.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Technology Stack (Priority Slide) -->
+    <div class="slide" data-notes="Detailed technology breakdown: Flutter 3.x, Dart SDK, TMDB REST API v3, HTTP package, and SharedPreferences.">
+      <div class="slide-header">
+        <span class="category-badge">ENGINEERING STACK</span>
+        <h2 class="slide-title">Technology Used</h2>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <span class="tag-pill tag-blue">Framework</span>
+          <div class="card-title" style="margin-top: 10px; font-size: 1.5rem;">Flutter 3.x</div>
+          <p class="card-desc">Google's UI toolkit for compiling fast, natively compiled cross-platform mobile apps from a single codebase.</p>
+        </div>
+        <div class="card">
+          <span class="tag-pill tag-blue">Language</span>
+          <div class="card-title" style="margin-top: 10px; font-size: 1.5rem;">Dart SDK</div>
+          <p class="card-desc">Strongly typed object-oriented language optimized for reactive client interfaces and asynchronous execution.</p>
+        </div>
+        <div class="card">
+          <span class="tag-pill">API Provider</span>
+          <div class="card-title" style="margin-top: 10px; font-size: 1.5rem;">TMDB REST API v3</div>
+          <p class="card-desc">The Movie Database API endpoint providing real-time trending movies, posters, cast bios, and trailers.</p>
+        </div>
+        <div class="card">
+          <span class="tag-pill">Networking</span>
+          <div class="card-title" style="margin-top: 10px; font-size: 1.5rem;">HTTP Package</div>
+          <p class="card-desc">Handles asynchronous HTTP GET requests, URI query parameters, and header authorization.</p>
+        </div>
+        <div class="card">
+          <span class="tag-pill tag-gold">Persistence</span>
+          <div class="card-title" style="margin-top: 10px; font-size: 1.5rem;">SharedPreferences</div>
+          <p class="card-desc">Key-value persistent local storage engine used to store watchlists and user preferences across app launches.</p>
+        </div>
+        <div class="card">
+          <span class="tag-pill tag-gold">Media & UI</span>
+          <div class="card-title" style="margin-top: 10px; font-size: 1.5rem;">Google Fonts & Video</div>
+          <p class="card-desc">Montserrat & Inter fonts, CachedNetworkImage for bandwidth efficiency, and VideoPlayer for trailer reels.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: System / App Architecture (Priority Slide) -->
+    <div class="slide" data-notes="Explaining the 3-Tier Layered Architecture: UI View Widgets -> Business State Logic -> Data Services -> TMDB API and SharedPreferences.">
+      <div class="slide-header">
+        <span class="category-badge">SOFTWARE ARCHITECTURE</span>
+        <h2 class="slide-title">System & App Architecture</h2>
+      </div>
+
+      <div class="flow-container">
+        <div class="flow-step">
+          <div class="flow-step-num">STEP 01</div>
+          <div class="flow-step-title">User Touch Input</div>
+          <div class="flow-step-desc">Tap card, search, tab switch</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">STEP 02</div>
+          <div class="flow-step-title">Flutter UI Views</div>
+          <div class="flow-step-desc">HomeScreen, Search, Details</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step highlight">
+          <div class="flow-step-num">STEP 03</div>
+          <div class="flow-step-title">ApiService Layer</div>
+          <div class="flow-step-desc">HTTP client & JSON router</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">STEP 04</div>
+          <div class="flow-step-title">TMDB / Storage</div>
+          <div class="flow-step-desc">Remote API & SharedPreferences</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">STEP 05</div>
+          <div class="flow-step-title">State Render</div>
+          <div class="flow-step-desc">ValueNotifier UI rebuild</div>
+        </div>
+      </div>
+
+      <div class="card card-accent" style="margin-top: 18px;">
+        <div class="card-title" style="color: var(--gold-rating); font-size: 1.5rem;">💡 Architectural Principles</div>
+        <ul class="bullet-list">
+          <li><strong>Clean Separation of Concerns:</strong> Business logic and API parsing (`ApiService`) are decoupled from UI rendering widgets.</li>
+          <li><strong>Reactive State Management:</strong> `FavoritesService` utilizes `ValueNotifier` to instantly update the bottom navigation badge count when items are saved.</li>
+          <li><strong>Strong Data Models:</strong> `Movie` and `Actor` Dart classes perform type-safe JSON deserialization with null safety fallbacks.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Main Features (Priority Slide) -->
+    <div class="slide" data-notes="Walking through main features: Animated Splash, Home Hero Feed, Reels Feed, Search & Debounce, Detailed Movie view, and Watchlist.">
+      <div class="slide-header">
+        <span class="category-badge">FEATURE BREAKDOWN</span>
+        <h2 class="slide-title">Main Features</h2>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title">🚀 Animated Splash</div>
+          <p class="card-desc">Custom logo animation startup screen that pre-initializes local storage services.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🏠 Home Discovery Hub</div>
+          <p class="card-desc">Hero backdrop banner, trending rows, top-rated carousels, and genre filter chips.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🎬 Short Trailers Feed (Reels)</div>
+          <p class="card-desc">Full-screen vertical swipe video player with inline trailer controls.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">🔍 Search & Filter</div>
+          <p class="card-desc">Debounced query search with instant genre filtering and grid results.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">📖 Movie & Cast Details</div>
+          <p class="card-desc">Backdrop header, storyline summary, actor filmography, rating stats, and trailer launcher.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">⭐ Watchlist Manager</div>
+          <p class="card-desc">Bookmark movies locally with persistent SharedPreferences state and dynamic count badges.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: UI/UX Design -->
+    <div class="slide" data-notes="Focusing on design aesthetics: Dark Obsidian theme, Crimson primary accent, glassmorphism cards, and responsive poster layouts.">
+      <div class="slide-header">
+        <span class="category-badge">DESIGN SYSTEM & AESTHETICS</span>
+        <h2 class="slide-title">UI/UX Design</h2>
+      </div>
+
+      <div class="grid-2">
+        <div class="card card-accent">
+          <div class="card-title" style="font-size: 1.55rem; color: var(--primary-crimson);">🎨 Cinematic Visual Design</div>
+          <ul class="bullet-list" style="margin-top: 10px;">
+            <li><strong>Dark Obsidian Theme (#0D0E15):</strong> Ambient theater background designed for maximum poster contrast and low eye strain.</li>
+            <li><strong>Netflix Crimson Accent (#E50914):</strong> Primary brand accent highlighting action buttons, active navigation, and badges.</li>
+            <li><strong>Gold Rating Highlights (#FFC107):</strong> Visual rating stars (e.g. ⭐ 8.5/10) for rapid decision making.</li>
+            <li><strong>Typography Hierarchy:</strong> Montserrat bold display headers paired with clean Inter body copy.</li>
+          </ul>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="card">
+            <div class="card-title" style="color: var(--gold-rating);">🖼️ Poster-Based Browsing</div>
+            <p class="card-desc">High-aspect-ratio poster cards with hover scale animations and rating badges.</p>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color: var(--gold-rating);">✨ Glassmorphism & Elevation</div>
+            <p class="card-desc">Semi-transparent dark surfaces with rounded borders and clean card margins.</p>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color: var(--gold-rating);">📱 Responsive Layouts</div>
+            <p class="card-desc">Auto-adjusting grid columns and scalable carousels optimized for mobile displays.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: API Integration (Priority Slide) -->
+    <div class="slide" data-notes="Detailed view of the TMDB REST API data pipeline: Request -> Response -> JSON Parsing -> UI Render.">
+      <div class="slide-header">
+        <span class="category-badge">REST API DATA PIPELINE</span>
+        <h2 class="slide-title">API Integration</h2>
+      </div>
+
+      <div class="flow-container">
+        <div class="flow-step">
+          <div class="flow-step-num">REQUEST</div>
+          <div class="flow-step-title">Flutter App</div>
+          <div class="flow-step-desc">Initiates API query</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">NETWORK</div>
+          <div class="flow-step-title">HTTP Request</div>
+          <div class="flow-step-desc">Async GET with API Key</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step highlight">
+          <div class="flow-step-num">SERVER</div>
+          <div class="flow-step-title">TMDB API Server</div>
+          <div class="flow-step-desc">Processes query & returns JSON</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">PARSER</div>
+          <div class="flow-step-title">JSON Model</div>
+          <div class="flow-step-desc">Movie.fromJson()</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">VIEW</div>
+          <div class="flow-step-title">Flutter UI</div>
+          <div class="flow-step-desc">Renders poster grid</div>
+        </div>
+      </div>
+
+      <div class="card card-accent" style="margin-top: 18px;">
+        <div class="card-title" style="color: var(--primary-crimson); font-size: 1.5rem;">🛠️ Network Resilience & Fallbacks</div>
+        <p class="card-desc" style="font-size: 1.15rem;">
+          The `ApiService` includes automatic fallback image URLs (Unsplash CDN) if TMDB backdrop or poster image paths are missing or null.
+          Network caching via `CachedNetworkImage` prevents duplicate HTTP requests and reduces mobile data usage.
+        </p>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Application Workflow (Priority Slide) -->
+    <div class="slide" data-notes="End-to-end user navigation flow: Splash -> Main Shell -> Home/Reels/Search -> Movie Details -> Watchlist.">
+      <div class="slide-header">
+        <span class="category-badge">USER NAVIGATION EXPERIENCE</span>
+        <h2 class="slide-title">Application Workflow</h2>
+      </div>
+
+      <div class="flow-container">
+        <div class="flow-step">
+          <div class="flow-step-num">START</div>
+          <div class="flow-step-title">Splash Screen</div>
+          <div class="flow-step-desc">Init services</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">SHELL</div>
+          <div class="flow-step-title">Main Nav Shell</div>
+          <div class="flow-step-desc">Bottom NavigationBar</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step highlight">
+          <div class="flow-step-num">DISCOVER</div>
+          <div class="flow-step-title">Home / Search / Reels</div>
+          <div class="flow-step-desc">Browse & filter</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">DETAILS</div>
+          <div class="flow-step-title">Movie Page</div>
+          <div class="flow-step-desc">View cast & trailers</div>
+        </div>
+        <div class="flow-arrow">➔</div>
+        <div class="flow-step">
+          <div class="flow-step-num">SAVE</div>
+          <div class="flow-step-title">Watchlist</div>
+          <div class="flow-step-desc">Bookmark locally</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top: 18px;">
+        <div class="card-title" style="color: var(--gold-rating); font-size: 1.5rem;">✨ Smooth User Flow Features</div>
+        <p class="card-desc" style="font-size: 1.15rem;">
+          Using Flutter's `IndexedStack`, the app preserves scroll state and active filters across tab navigation, preventing unnecessary screen re-loads and providing instant page switches.
+        </p>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Future Scope (Priority Slide) -->
+    <div class="slide" data-notes="Potential roadmap enhancements: Firebase/Supabase user authentication, AI movie recommendations, watch history tracking, and offline downloads.">
+      <div class="slide-header">
+        <span class="category-badge">PROJECT ROADMAP</span>
+        <h2 class="slide-title">Future Scope</h2>
+      </div>
+
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating);">🔐 Cloud Authentication</div>
+          <p class="card-desc">Firebase Auth / Supabase integration for multi-device sync and user profiles.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating);">🤖 AI Recommendations</div>
+          <p class="card-desc">Machine-learning based movie suggestions tailored to user watchlist affinity.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating);">⏱️ Watch History</div>
+          <p class="card-desc">Tracking trailer viewing history and allowing users to resume trailer clips.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating);">🔔 Push Notifications</div>
+          <p class="card-desc">Real-time release alerts for favorited upcoming movies and new trailers.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating);">📥 Offline Mode</div>
+          <p class="card-desc">Hive local database caching for viewing movie details without an internet connection.</p>
+        </div>
+        <div class="card">
+          <div class="card-title" style="color: var(--gold-rating);">📺 Video Streaming</div>
+          <p class="card-desc">HLS / DASH video protocol integration for full-length legal movie streaming.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: Conclusion -->
+    <div class="slide" data-notes="Wrapping up the presentation. Cinemacentral demonstrates end-to-end Flutter development, REST API integration, responsive design, and clean architecture.">
+      <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; background: radial-gradient(circle at center, rgba(229,9,20,0.12) 0%, transparent 70%);">
+        <span class="category-badge" style="font-size: 1.05rem;">COLLEGE PROJECT SUMMARY</span>
+        <h2 class="slide-title" style="font-size: 3.2rem; margin: 12px 0 18px;">Conclusion</h2>
+        <p style="max-width: 850px; color: var(--text-white); font-size: 1.3rem; line-height: 1.65; margin-bottom: 28px;">
+          <strong>Cinemacentral</strong> successfully demonstrates mobile software engineering excellence, combining a dark cinematic UI/UX with real-time TMDB REST API integration and persistent storage.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 950px; margin-bottom: 36px; text-align: left;">
+          <div class="card">
+            <div class="card-title" style="color: var(--primary-crimson); font-size: 1.45rem;">Flutter Mastery</div>
+            <p class="card-desc">Material 3, custom video player, smooth navigation, and responsive layouts.</p>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color: var(--gold-rating); font-size: 1.45rem;">API Integration</div>
+            <p class="card-desc">Asynchronous REST requests, JSON model parsing, and network image caching.</p>
+          </div>
+          <div class="card">
+            <div class="card-title" style="color: var(--tech-blue); font-size: 1.45rem;">UI/UX Quality</div>
+            <p class="card-desc">Netflix-inspired dark theme engineered for modern smartphone displays.</p>
+          </div>
+        </div>
+
+        <h3 style="font-family: var(--font-heading); font-size: 2.2rem; color: var(--gold-rating);">THANK YOU!</h3>
+        <p style="color: var(--text-gray); font-size: 1.1rem; margin-top: 8px;">Questions & Answers | Cinemacentral Final Project Viva</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Deck Navigation Footer -->
+  <div class="deck-footer">
+    <div class="footer-left">
+      <span class="footer-title">Cinemacentral • Projector Optimized Deck</span>
+    </div>
+    <div class="footer-right">
+      <button class="nav-btn" onclick="toggleNotes()">📝 Notes (N)</button>
+      <button class="nav-btn" onclick="toggleFullscreen()">🖥️ Fullscreen (F)</button>
+      <button class="nav-btn" onclick="prevSlide()">❮ Prev</button>
+      <span class="slide-counter" id="slideCounter">1 / 12</span>
+      <button class="nav-btn" onclick="nextSlide()">Next ❯</button>
+    </div>
+  </div>
+
+  <!-- Speaker Notes Panel -->
+  <div class="notes-panel" id="notesPanel">
+    <div class="notes-header">
+      <span>SPEAKER NOTES / VIVA GUIDE</span>
+      <span style="cursor: pointer;" onclick="toggleNotes()">✕</span>
+    </div>
+    <div class="notes-content" id="notesContent">
+      Welcome to the Cinemacentral project presentation. Today we are presenting a modern movie discovery and entertainment mobile application built using Flutter and Dart.
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const slideCounter = document.getElementById('slideCounter');
+  const progressBar = document.getElementById('progressBar');
+  const notesContent = document.getElementById('notesContent');
+  const notesPanel = document.getElementById('notesPanel');
+
+  function updateSlide() {
+    slides.forEach((slide, index) => {
+      slide.classList.toggle('active', index === currentSlide);
+    });
+    slideCounter.innerText = `${currentSlide + 1} / ${slides.length}`;
+    progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+    
+    // Update speaker notes
+    const activeNotes = slides[currentSlide].getAttribute('data-notes') || 'No presenter notes for this slide.';
+    notesContent.innerText = activeNotes;
+  }
+
+  function nextSlide() {
+    if (currentSlide < slides.length - 1) {
+      currentSlide++;
+      updateSlide();
+    }
+  }
+
+  function prevSlide() {
+    if (currentSlide > 0) {
+      currentSlide--;
+      updateSlide();
+    }
+  }
+
+  function toggleNotes() {
+    notesPanel.classList.toggle('active');
+  }
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        alert(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }
+
+  // Keyboard navigation listener
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      prevSlide();
+    } else if (e.key === 'f' || e.key === 'F') {
+      toggleFullscreen();
+    } else if (e.key === 'n' || e.key === 'N') {
+      toggleNotes();
+    } else if (e.key === 'Home') {
+      currentSlide = 0;
+      updateSlide();
+    } else if (e.key === 'End') {
+      currentSlide = slides.length - 1;
+      updateSlide();
+    }
+  });
+
+  // Initialize
+  updateSlide();
+</script>
+
+</body>
+</html>
